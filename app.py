@@ -38,12 +38,19 @@ scatter = px.scatter(df,
         'y': ''
     }
 )
-scatter.update_layout(plot_bgcolor='white')
+scatter.update_layout(
+    plot_bgcolor='rgb(250,250,250)',
+    legend={
+        'x': 0.85,
+        'y': 0.95,
+        'bgcolor': 'rgb(250,250,250)'
+    }
+)
 
 def make_range_plot(indices):
     bars = np.zeros(len(df)//2)
     bars[indices] = 1
-    return px.imshow([bars],
+    rangeplot = px.imshow([bars],
         color_continuous_scale=['white', 'gray'],
         # width=400,
         # height=50,
@@ -51,6 +58,8 @@ def make_range_plot(indices):
         zmin=0,
         zmax=1
     )
+    rangeplot.update_traces(showscale=False)
+    return rangeplot
 
 app.layout = html.Div([
     html.H1(id='title', children='Music Embedding'),
@@ -59,6 +68,7 @@ app.layout = html.Div([
         selectedData={'points': []},
         style={'backgroundColor': None}
     ),
+    html.Div(id='audio'),
     dcc.Graph(id='timerange',
         figure=make_range_plot([])
     )
@@ -77,25 +87,24 @@ app.layout = html.Div([
 @app.callback(
     Output('timerange', 'figure'),
     Input('scatter', 'selectedData'))
-def update_timerange(selection):
+def update_timerange_and_audio(selection):
     if selection is None:
         return make_range_plot([])
     else:
         new_indices = [p['customdata'][0] for p in selection['points']]
         return make_range_plot(new_indices)
 
-# @app.callback(
-#     Output('audio-player', 'currentTime'),
-#     Input('jump-button', 'n_clicks'))
-# def update_output(n_clicks):
-#     return 60
-
-# @app.callback(
-#     Output('title', 'children'),
-#     Input('audio-player', 'currentTime'),
-# )
-# def update_title(currentTime):
-#     return 'Current time is: {}'.format(currentTime)
+@app.callback(
+    Output('audio', 'children'),
+    Input('scatter', 'clickData'))
+def update_audio(clicked):
+    if clicked is None:
+        return []
+    else:
+        source = 'static/frames/frame-{:04d}.wav'.format(
+            clicked['points'][0]['customdata'][0])
+        return html.Audio(src=source, controls=True)
+        
 
 if __name__ == '__main__':
     app.run_server(debug=True)
