@@ -1,0 +1,8 @@
+frames/*
+feature-extraction/*.mp3
+feature-extraction/*.wav
+feature-extraction/*.ogg
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints
+.vscode
