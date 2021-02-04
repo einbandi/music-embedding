@@ -1,4 +1,4 @@
-frames/*
+static/*
 feature-extraction/*.mp3
 feature-extraction/*.wav
 feature-extraction/*.ogg
